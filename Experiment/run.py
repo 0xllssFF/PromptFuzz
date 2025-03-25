@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode', choices=['hijacking', 'extraction'], default='extraction', help='The mode of the fuzzing process')
     parser.add_argument('--openai_key', type=str, default=None, help='OpenAI API Key')
     parser.add_argument('--model_path', type=str, default='gpt-3.5-turbo-0125', help='target model path')
-    parser.add_argument('--max_query', type=int, default=1000,
+    parser.add_argument('--max_query', type=int, default=2000,
                         help='The maximum number of queries')
     parser.add_argument('--max_jailbreak', type=int,
                         default=9999999, help='The maximum jailbreak number')

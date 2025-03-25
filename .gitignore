@@ -4,3 +4,4 @@ __pycache__
 *.pyc
 *.csv
 Results/
+PromptFuzz/utils/constants.py
