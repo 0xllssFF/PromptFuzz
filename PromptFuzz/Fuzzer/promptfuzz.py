@@ -10,7 +10,7 @@ from gptfuzzer.fuzzer.mutator import (
     OpenAIMutatorGenerateSimilar, OpenAIMutatorRephrase, OpenAIMutatorShorten)
 from gptfuzzer.fuzzer import GPTFuzzer
 from gptfuzzer.utils.predict import MatchPredictor, AccessGrantedPredictor
-from gptfuzzer.llm import OpenAILLM, LocalLLMOpenAI, OpenAIEmbeddingLLM
+from gptfuzzer.llm import OpenAILLM, LocalLLMOpenAI, OpenAIEmbeddingLLM,OtherEmbeddingLLM
 from PromptFuzz.utils import constants
 
 import random
@@ -118,7 +118,10 @@ def run_fuzzer(args):
         select_policy = MCTSExploreSelectPolicy()
         
         few_shot_examples = pd.read_csv(f'./Datasets/{args.mode}_few_shot_example.csv')
-        embedding_model = OpenAIEmbeddingLLM("text-embedding-ada-002", args.openai_key)
+        if 'gpt' in args.model_path:
+            embedding_model = OpenAIEmbeddingLLM("text-embedding-ada-002", args.openai_key)
+        else:
+            embedding_model = OtherEmbeddingLLM('Alibaba-NLP/gte-Qwen2-1.5B-instruct')
         mutate_policy = MutateWeightedSamplingPolicy(
             mutator_list,
             weights=args.mutator_weights,

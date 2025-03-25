@@ -12,6 +12,7 @@ from gptfuzzer.llm import LLM
 from gptfuzzer.utils.template import synthesis_message
 from gptfuzzer.utils.predict import Predictor
 import warnings
+import os
 
 
 class PromptNode:
@@ -58,6 +59,38 @@ class PromptNode:
         return len(self.results)
 
 
+
+def get_logger(name):
+    # if 'log' in name:
+    #     logger = logging.getLogger(name)
+    #     logger.setLevel(logging.INFO)
+    #     file_handler = logging.FileHandler(name)
+    #     file_handler.setLevel(logging.INFO)
+
+    #     formatter = logging.Formatter(
+    #         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    #     )
+    #     file_handler.setFormatter(formatter)
+
+    #     logger.addHandler(file_handler)
+    # elif 'prompt' in name:
+    class CSVMessageFormatter(logging.Formatter):
+        def format(self, record):
+            message = record.getMessage()
+            message = message.replace('"', '""')
+            return f'"{message}"'
+        
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler(name)
+    file_handler.setLevel(logging.INFO)
+    csv_message_formatter = CSVMessageFormatter()
+    file_handler.setFormatter(csv_message_formatter)
+
+    logger.addHandler(file_handler)
+    
+    return logger
+
 class GPTFuzzer:
     def __init__(self,
                  defenses: 'list[dict]',
@@ -103,15 +136,18 @@ class GPTFuzzer:
         self.max_iteration: int = max_iteration
 
         self.energy: int = energy
-        if result_file is None:
-            result_file = f'results-{time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())}.csv'
+        # if result_file is None:
+        #     result_file = f'results-{time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())}.txt'
 
-        self.raw_fp = open(result_file, 'w', buffering=1)
-        self.writter = csv.writer(self.raw_fp)
+        self.output_dir = "/home/lsf/agent/PromptFuzz/Results/focus/hijacking"
+        self.prompt_logger = get_logger(os.path.join(self.output_dir, "prompt.txt"))
+
+        # self.raw_fp = open(result_file, 'w', buffering=1)
+        # self.writter = csv.writer(self.raw_fp)
         # self.writter.writerow(
         #     ['index', 'prompt', 'response', 'parent', 'results', 'mutation', 'query'])
-        self.writter.writerow(
-            ['system_prompt', 'user_prompt_1', 'user_prompt_1', 'mutation'])
+        # self.writter.writerow(
+            # ['system_prompt', 'user_prompt_1', 'user_prompt_1', 'mutation'])
         self.mutation = None
         self.generate_in_batch = True
         self.update_pool = update_pool
@@ -174,14 +210,17 @@ class GPTFuzzer:
             # Batch predict for all active responses
             predictions = self.predictor.predict(responses, defense['access_code'])
 
+            for i,n in enumerate(active_messages):
+                system_message = defense['pre_prompt']
+                post_prompt = defense['post_prompt']
+                input_prompt = active_messages[i] + post_prompt
+                self.prompt_logger.info(input_prompt.replace('\n', '\\n'))
             # Append responses and results to prompt nodes, and check for early termination
             for i, (prompt_node, response, prediction) in enumerate(zip(active_prompt_nodes, responses, predictions)):
                 prompt_node.response.append(response)
                 prompt_node.results.append(prediction)
 
-                system_message = defense['pre_prompt']
-                post_prompt = defense['post_prompt']
-                self.writter.writerow([system_message, active_messages[i], post_prompt, self.mutation])
+                # self.writter.writerow([system_message, active_messages[i], post_prompt, self.mutation])
 
                 if self.dynamic_allocate and sum(prompt_node.results) + len(self.defenses) - defense_index - 1 < self.threshold:
                     early_termination_indices.add(prompt_nodes.index(prompt_node))

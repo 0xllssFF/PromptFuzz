@@ -3,6 +3,7 @@ import logging
 import time
 import concurrent.futures
 
+from sentence_transformers import SentenceTransformer
 
 
 class LLM:
@@ -141,3 +142,14 @@ class OpenAIEmbeddingLLM():
         )
         
         return response.data[0].embedding
+
+class OtherEmbeddingLLM():
+    def __init__(self, model_path=None):
+        self.model = SentenceTransformer("Alibaba-NLP/gte-Qwen2-1.5B-instruct", trust_remote_code=True).to('cuda')
+
+    
+    def get_embedding(self, prompt):
+
+        embedding = self.model.encode(prompt)
+        
+        return embedding

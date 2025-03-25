@@ -1,1 +1,1 @@
-from .llm import LLM, OpenAILLM, OpenAIEmbeddingLLM, LocalLLMOpenAI
+from .llm import LLM, OpenAILLM, OpenAIEmbeddingLLM, LocalLLMOpenAI,OtherEmbeddingLLM
