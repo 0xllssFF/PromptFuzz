@@ -10,7 +10,7 @@ from gptfuzzer.fuzzer.mutator import (
     OpenAIMutatorGenerateSimilar, OpenAIMutatorRephrase, OpenAIMutatorShorten)
 from gptfuzzer.fuzzer import GPTFuzzer
 from gptfuzzer.utils.predict import MatchPredictor, AccessGrantedPredictor
-from gptfuzzer.llm import OpenAILLM, OpenAIEmbeddingLLM
+from gptfuzzer.llm import OpenAILLM, LocalLLMOpenAI, OpenAIEmbeddingLLM
 from PromptFuzz.utils import constants
 
 import random
@@ -22,9 +22,13 @@ httpx_logger.setLevel(logging.WARNING)
 
 
 def run_fuzzer(args):
-        
-    mutate_model = OpenAILLM(args.model_path, args.openai_key)
-    target_model = OpenAILLM(args.model_path, args.openai_key)
+    
+    if 'gpt' in args.model_path:
+        mutate_model = OpenAILLM(args.model_path, args.openai_key)
+        target_model = OpenAILLM(args.model_path, args.openai_key)
+    else:
+        mutate_model = LocalLLMOpenAI(args.model_path, args.server_url)
+        target_model = LocalLLMOpenAI(args.model_path, args.server_url)
 
     if args.mode == 'hijacking':
         predictor = AccessGrantedPredictor()

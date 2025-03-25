@@ -78,11 +78,12 @@ class LocalLLMOpenAI(LLM):
     def __init__(self,
                  model_path,
                  server_url,
+                 api_key=None,
                  system_message=None
                 ):
         super().__init__()
 
-        self.client = OpenAI(base_url=server_url)
+        self.client = OpenAI(base_url=server_url, api_key = 'empty')
         self.model_path = model_path
         self.post_prompt = None
         self.system_message = system_message if system_message is not None else "You are a helpful assistant."
