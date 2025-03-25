@@ -108,8 +108,10 @@ class GPTFuzzer:
 
         self.raw_fp = open(result_file, 'w', buffering=1)
         self.writter = csv.writer(self.raw_fp)
+        # self.writter.writerow(
+        #     ['index', 'prompt', 'response', 'parent', 'results', 'mutation', 'query'])
         self.writter.writerow(
-            ['index', 'prompt', 'response', 'parent', 'results', 'mutation', 'query'])
+            ['system_prompt', 'user_prompt_1', 'user_prompt_1', 'mutation'])
         self.mutation = None
         self.generate_in_batch = True
         self.update_pool = update_pool
@@ -159,6 +161,8 @@ class GPTFuzzer:
         messages = [prompt_node.prompt for prompt_node in prompt_nodes]
         early_termination_indices = set()
 
+        print(messages)
+
         for defense_index, defense in enumerate(self.defenses):
             # Skip evaluation for prompts marked for early termination
             active_messages = [messages[i] for i in range(len(messages)) if i not in early_termination_indices]
@@ -175,11 +179,15 @@ class GPTFuzzer:
                 prompt_node.response.append(response)
                 prompt_node.results.append(prediction)
 
+                system_message = defense['pre_prompt']
+                post_prompt = defense['post_prompt']
+                self.writter.writerow([system_message, active_messages[i], post_prompt, self.mutation])
+
                 if self.dynamic_allocate and sum(prompt_node.results) + len(self.defenses) - defense_index - 1 < self.threshold:
                     early_termination_indices.add(prompt_nodes.index(prompt_node))
                     prompt_node.prompt = 'early termination'
 
-            print(responses)
+
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
         self.current_iteration += 1
@@ -189,9 +197,9 @@ class GPTFuzzer:
                 prompt_node.index = len(self.prompt_nodes)
                 if self.update_pool:
                     self.prompt_nodes.append(prompt_node)
-                self.writter.writerow([prompt_node.index, prompt_node.prompt,
-                                       prompt_node.response, prompt_node.parent.index, prompt_node.results,
-                                       self.mutation, self.current_query])
+                # self.writter.writerow([prompt_node.index, prompt_node.prompt,
+                #                        prompt_node.response, prompt_node.parent.index, prompt_node.results,
+                #                        self.mutation, self.current_query])
 
             self.current_jailbreak += prompt_node.num_jailbreak
             self.current_query += prompt_node.num_query
