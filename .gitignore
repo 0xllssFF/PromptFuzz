@@ -2,5 +2,4 @@
 __pycache__
 *.log
 *.pyc
-*.csv
 PromptFuzz/utils/constants.py
