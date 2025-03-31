@@ -2,7 +2,7 @@
 
 GET_METRICS_SCRIPT="./Experiment/get_metric.py"
 
-METHOD="gcg" # human_expert, gcg, gptfuzz, initial_seed
+METHOD="promptfuzz" # human_expert, gcg, gptfuzz, initial_seed
 MODE="hijacking"
 if [ "$METHOD" = "gcg" ] || [ "$METHOD" = "human_expert" ] || [ "$METHOD" = "initial_seed" ]; then
     TARGET_PATH="./Results/init/${MODE}/baseline/${METHOD}/"

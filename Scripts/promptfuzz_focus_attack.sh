@@ -47,7 +47,7 @@ fi
 # Set the log path
 LOG_PATH="Logs/${PHASE}/${MODE}"
 
-MODEL_PATH="Qwen/Qwen2.5-7B-Instruct"
+MODEL_PATH="meta-llama/Llama-3.1-8B-Instruct"
 SERVER_URL="http://localhost:54321/v1"
 
 # Create the log directory if it does not exist
