@@ -10,7 +10,7 @@ from gptfuzzer.fuzzer.mutator import (
     OpenAIMutatorGenerateSimilar, OpenAIMutatorRephrase, OpenAIMutatorShorten)
 from gptfuzzer.fuzzer import GPTFuzzer
 from gptfuzzer.utils.predict import MatchPredictor, AccessGrantedPredictor
-from gptfuzzer.llm import OpenAILLM, LocalLLMOpenAI, OpenAIEmbeddingLLM,OtherEmbeddingLLM
+from gptfuzzer.llm import OpenAILLM, LocalLLMOpenAI, OpenAIEmbeddingLLM,OtherEmbeddingLLM,LocalLLMMistral
 from PromptFuzz.utils import constants
 
 import random
@@ -26,6 +26,9 @@ def run_fuzzer(args):
     if 'gpt' in args.model_path:
         mutate_model = OpenAILLM(args.model_path, args.openai_key)
         target_model = OpenAILLM(args.model_path, args.openai_key)
+    elif 'Mistral' in args.model_path:
+        mutate_model = LocalLLMMistral(args.model_path, args.server_url)
+        target_model = LocalLLMMistral(args.model_path, args.server_url)
     else:
         mutate_model = LocalLLMOpenAI(args.model_path, args.server_url)
         target_model = LocalLLMOpenAI(args.model_path, args.server_url)

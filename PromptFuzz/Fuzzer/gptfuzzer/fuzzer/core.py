@@ -139,7 +139,7 @@ class GPTFuzzer:
         # if result_file is None:
         #     result_file = f'results-{time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())}.txt'
 
-        self.output_dir = "/home/lsf/agent/PromptFuzz/Results/focus/hijacking"
+        self.output_dir = "/home/shaofei/PromptFuzz/Results/focus/hijacking"
         self.prompt_logger = get_logger(os.path.join(self.output_dir, "prompt.txt"))
 
         self.raw_fp = open(result_file, 'w', buffering=1)
